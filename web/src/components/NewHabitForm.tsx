@@ -1,5 +1,6 @@
 import { Check } from "phosphor-react";
 import * as Checkbox from '@radix-ui/react-checkbox'
+import { FormEvent, useState } from "react";
 
 const availableWeekDays = [
   'Sunday',
@@ -12,8 +13,26 @@ const availableWeekDays = [
 ]
 
 export function NewHabitForm() {
+  const [title, setTitle] = useState('')
+  const [weekDays, setWeekDays] = useState<number[]>([])
+  
+  function createNewHabit(event: FormEvent) {
+    event.preventDefault()
+    console.log(title, weekDays)
+  }
+
+  function handleToggleWeekDay(weekDay: number) {
+    if (weekDays.includes(weekDay)) {
+      const weekDaysWithRemovedOne = weekDays.filter(day => day !== weekDay)
+      setWeekDays(weekDaysWithRemovedOne)
+    } else {
+      const weekDaysWithAddedOne = [...weekDays, weekDay]
+      setWeekDays(weekDaysWithAddedOne)
+    }
+  }
+
   return (
-    <form className="w-full flex flex-col mt-6">
+    <form onSubmit={createNewHabit} className="w-full flex flex-col mt-6">
       <label
         htmlFor="title"
         className="font-semibold leading-tight"
@@ -27,6 +46,7 @@ export function NewHabitForm() {
         placeholder="e.g.: exercise, study, sleep well, etc."
         className="p-4 rounded-lg mt-3 bg-gray-800 text-white placeholder:text-gray-400"
         autoFocus
+        onChange={event => setTitle(event.target.value)}
       />
 
       <label
@@ -37,9 +57,13 @@ export function NewHabitForm() {
       </label>
 
       <div className="flex flex-col gap-2 mt-3">
-        {availableWeekDays.map(weekDay => {
+        {availableWeekDays.map((weekDay, index) => {
           return (
-            <Checkbox.Root key={weekDay} className="flex items-center gap-3 group">
+            <Checkbox.Root
+              key={weekDay}
+              className="flex items-center gap-3 group"
+              onCheckedChange={() => handleToggleWeekDay(index)}
+            >
               <div
                 className="h-8 w-8 rounded-lg flex items-center justify-center bg-gray-800 border-2 border-gray-600 group-data-[state=checked]:bg-emerald-600 group-data-[state=checked]:border-emerald-600 hover:bg-gray-700 hover:border-gray-500"
               >

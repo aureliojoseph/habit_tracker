@@ -1,26 +1,32 @@
-import * as Popover from '@radix-ui/react-popover'
-import * as Checkbox from '@radix-ui/react-checkbox'
-import clsx from 'clsx'
 import { ProgressBar } from './ProgressBar'
-import { Check } from 'phosphor-react'
+import { HabitsList } from './HabitsList'
+import * as Popover from '@radix-ui/react-popover'
+import clsx from 'clsx'
 import dayjs from 'dayjs'
+import { useState } from 'react'
 
 interface HabitDayProps {
   date: Date
-  completed?: number
+  defaultCompleted?: number
   amount?: number
 }
 
-export function HabitDay({ completed = 0, amount = 0, date }: HabitDayProps) {
+export function HabitDay({ defaultCompleted = 0, amount = 0, date }: HabitDayProps) {
+  const [completed, setCompleted] = useState(defaultCompleted)
+
   const completedPercentage = amount > 0 ? Math.round((completed / amount) * 100) : 0
 
   const dayAndMonth = dayjs(date).format('MM/DD')
   const dayOfTheWeek = dayjs(date).format('dddd')
 
+  function handleCompletedChanged(completed: number) {
+    setCompleted(completed)
+  }
+
   return (
     <Popover.Root>
       <Popover.Trigger
-        className={clsx('w-10 h-10 rounded-lg cursor-pointer', {
+        className={clsx('w-10 h-10 rounded-lg cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2 focus:ring-offset-background', {
           'bg-gray-900 border-gray-700': completedPercentage === 0,
           'bg-cyan-900 border-cyan-700': completedPercentage > 0 && completedPercentage < 20,
           'bg-cyan-800 border-cyan-600': completedPercentage >= 20 && completedPercentage < 40,
@@ -37,27 +43,7 @@ export function HabitDay({ completed = 0, amount = 0, date }: HabitDayProps) {
 
           <ProgressBar progress={completedPercentage} />
 
-          <div className="mt-6 flex flex-col gap-3">
-            <Checkbox.Root className="flex items-center gap-3 group">
-              <div
-                className="h-8 w-8 rounded-lg flex items-center justify-center bg-gray-800 border-2 border-gray-600 group-data-[state=checked]:bg-emerald-600 group-data-[state=checked]:border-emerald-600 hover:bg-gray-700 hover:border-gray-500"
-              >
-                <Checkbox.Indicator>
-                  <Check
-                    size={20}
-                    className="text-white group-hover:text-emerald-300"
-                    weight="bold"
-                  />
-                </Checkbox.Indicator>
-              </div>
-
-              <span
-                className="font-semibold text-xl text-white leading-tight group-data-[state=checked]:line-through group-data-[state=checked]:text-gray-800"
-              >
-                Study at least 1h per day
-              </span>
-            </Checkbox.Root>
-          </div>
+          <HabitsList date={date} onCompletedChanged={handleCompletedChanged} />
           
           <Popover.Arrow
             height={8}

@@ -1,6 +1,5 @@
 import dayjs from "dayjs"
 import { FastifyInstance } from "fastify"
-import { request } from "http"
 import { z } from "zod"
 import { prisma } from "./lib/prisma"
 
@@ -119,7 +118,7 @@ export async function appRoutes(app: FastifyInstance) {
     }
   })
 
-  app.get('/summary',async () => {
+  app.get('/summary', async () => {
     const summary = await prisma.$queryRaw`
       SELECT
         D.id,
@@ -133,11 +132,11 @@ export async function appRoutes(app: FastifyInstance) {
         (
           SELECT
           cast(count(*) as float)
-          FROM habit_week_days HWD
+          FROM habit_week_days HDW
           JOIN habits H
-            ON H.id = HWD.habit_id
+            ON H.id = HDW.habit_id
           WHERE
-            HWD.week_day = cast(strftime('%w', D.date/1000.0, 'unixepoch') as int)
+            HDW.week_day = cast(strftime('%w', D.date/1000.0, 'unixepoch') as int)
             AND H.created_at <= D.date
         ) as amount
       FROM days D
